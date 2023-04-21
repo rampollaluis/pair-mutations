@@ -1,0 +1,13 @@
+[package]
+name = "pairing"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = "0.4.24"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.96"
+eframe = "0.21.3"
+arboard = "3.2.0"
