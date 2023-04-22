@@ -10,6 +10,10 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use arboard::Clipboard;
 
+mod state_persistence;
+
+use state_persistence::{load_state_from_file, save_state_to_file};
+
 use eframe::egui::{self, Ui};
 
 fn read_members() -> Vec<String> {
@@ -36,17 +40,23 @@ fn main() -> Result<(), eframe::Error> {
         initial_window_size: Some(egui::vec2(980.0, 600.0)),
         ..Default::default()
     };
+
+    let app_state = match load_state_from_file::<MyApp>("state.json") {
+        Ok(state) => state,
+        Err(_) => MyApp::default(), // Provide a default state if the file doesn't exist or can't be read
+    };
+    
     eframe::run_native(
-        "PaiRings",
+        "PairMutations",
         options,
-        Box::new(|_cc| Box::new(MyApp::default())),
+        Box::new(|_cc| Box::new(app_state)),
     )
 
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 struct MyApp {
     members: Vec<Member>,
-    // history
     history: HashMap<String, Vec<Vec<String>>>,
     copied_to_clipboard: bool,
     search: String,
@@ -174,7 +184,16 @@ impl eframe::App for MyApp {
             
                 columns[0].horizontal(|ui| {
                     self.generate_pairs_btn(ui);
+
+                    if ui.button("Save data").clicked() {
+                        if let Err(e) = save_state_to_file(self, "state.json") {
+                            eprintln!("Error saving data: {}", e);
+                        } else {
+                            println!("Data saved to file.");
+                        }
+                    }
                 });
+
 
                 if !self.today_pairs.is_empty() {
                     columns[0].horizontal(|ui| {
@@ -286,6 +305,9 @@ fn members_to_json(members: &[Member]) -> String {
     - allow triples
     - solo/carry/ooo logic
     - allow to manually set pair and roll for rest
+    - remove Data struct
+    - remove history.txt and members.txt
+    - cleanup mod/use
 
     Members
     - add member - adds to members.txt

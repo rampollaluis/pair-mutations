@@ -1,0 +1,121 @@
+{
+  "members": [
+    {
+      "name": "Bert",
+      "ooo": false,
+      "carry": false,
+      "solo": false
+    },
+    {
+      "name": "Callum",
+      "ooo": false,
+      "carry": false,
+      "solo": true
+    },
+    {
+      "name": "Joel",
+      "ooo": false,
+      "carry": false,
+      "solo": false
+    },
+    {
+      "name": "Johnny",
+      "ooo": true,
+      "carry": true,
+      "solo": true
+    },
+    {
+      "name": "Karl",
+      "ooo": false,
+      "carry": false,
+      "solo": false
+    },
+    {
+      "name": "Lewis",
+      "ooo": false,
+      "carry": false,
+      "solo": false
+    },
+    {
+      "name": "Nico",
+      "ooo": true,
+      "carry": false,
+      "solo": false
+    }
+  ],
+  "history": {
+    "2023-03-19": [
+      [
+        "Karl",
+        "Lewis",
+        "Bert"
+      ],
+      [
+        "Joel",
+        "Johnny"
+      ]
+    ],
+    "2023-03-21": [
+      [
+        "Karl",
+        "Callum"
+      ],
+      [
+        "Joel",
+        "Bert",
+        "Lewis"
+      ]
+    ],
+    "2023-03-22": [
+      [
+        "Lewis"
+      ],
+      [
+        "Johnny",
+        "Callum"
+      ],
+      [
+        "Joel",
+        "Karl"
+      ],
+      [
+        "Nico",
+        "Bert"
+      ]
+    ],
+    "2023-03-20": [
+      [
+        "Callum",
+        "Lewis"
+      ],
+      [
+        "Nico",
+        "Bert"
+      ],
+      [
+        "Karl",
+        "Johnny"
+      ]
+    ],
+    "2023-04-05": [
+      [
+        "Lewis",
+        "Johnny",
+        "Callum"
+      ],
+      [
+        "Joel",
+        "Nico"
+      ],
+      [
+        "Karl",
+        "Bert"
+      ]
+    ]
+  },
+  "copied_to_clipboard": false,
+  "search": "",
+  "today_pairs": "",
+  "show_add_member_dialog": false,
+  "new_member": ""
+}
