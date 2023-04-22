@@ -1,8 +1,5 @@
-use std::fs::File;
-use std::io::prelude::*;
-use serde::{Deserialize, Serialize};
-use serde::de::DeserializeOwned;
-
+use std::{fs::File, io::prelude::*};
+use serde::{Serialize, de::DeserializeOwned};
 
 pub fn save_state_to_file<S: Serialize>(state: &S, file_path: &str) -> std::io::Result<()> {
     let json = serde_json::to_string_pretty(state).unwrap();

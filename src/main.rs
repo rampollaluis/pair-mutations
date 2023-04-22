@@ -1,20 +1,16 @@
-use std::fs::File;
-use std::hash::Hash;
-use std::io::{BufRead, BufReader};
-mod history_handler;
-mod pair_generator;
-mod models;
-use models::Data;
-use pair_generator::pairs_to_string;
+use std::{fs::File, hash::Hash, io::{BufRead, BufReader}, collections::HashMap};
+use eframe::egui::{self, Ui};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use arboard::Clipboard;
 
-mod state_persistence;
-
+use models::Data;
 use state_persistence::{load_state_from_file, save_state_to_file};
+use pair_generator::pairs_to_string;
 
-use eframe::egui::{self, Ui};
+mod models;
+mod state_persistence;
+mod pair_generator;
+mod history_handler;
 
 fn read_members() -> Vec<String> {
     let file = File::open("members.txt").unwrap();
@@ -307,7 +303,6 @@ fn members_to_json(members: &[Member]) -> String {
     - allow to manually set pair and roll for rest
     - remove Data struct
     - remove history.txt and members.txt
-    - cleanup mod/use
 
     Members
     - add member - adds to members.txt

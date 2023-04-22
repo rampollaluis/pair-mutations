@@ -1,5 +1,6 @@
-use crate::{models::Data, Member};
 use std::collections::HashMap;
+
+use crate::Member;
 
 fn get_days_since_last_pair(pair_history: &HashMap<String, Vec<Vec<String>>>, member1: &str, member2: &str) -> u32 {
     let mut days = 0;

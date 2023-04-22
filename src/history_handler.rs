@@ -1,6 +1,4 @@
-use std::fs::{File, OpenOptions};
-use std::io::{BufReader, BufWriter, Write, BufRead};
-use std::path::Path;
+use std::{fs::{File, OpenOptions}, io::{BufReader, BufWriter, Write, BufRead}, path::Path};
 use chrono::{NaiveDate, Utc, Duration};
 
 const FILENAME: &str = "history.txt";
