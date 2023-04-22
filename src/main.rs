@@ -3,29 +3,22 @@ use eframe::egui::{self, Ui};
 use serde::{Deserialize, Serialize};
 use arboard::Clipboard;
 
-use state_persistence::{load_state_from_file, save_state_to_file};
-use pair_generator::pairs_to_string;
+use state_persistence::{load_state, save_state};
+use pairs_handler::{pairs_to_string, generate_pairs};
 
 mod state_persistence;
-mod pair_generator;
+mod pairs_handler;
 
 fn main() -> Result<(), eframe::Error> {
-    // history_handler::append_to_history(&today_pairs);
-
-    // let mut pairs_output = today_pairs.replace(' ', " 👥");
-    // pairs_output = pairs_output.replace('+', "/");
-    // pairs_output = format!("{}{}", '👥', pairs_output);
-    // println!("{}", pairs_output);
-
-    // Our application state:
     let options = eframe::NativeOptions {
         initial_window_size: Some(egui::vec2(980.0, 600.0)),
         ..Default::default()
     };
 
-    let app_state = match load_state_from_file::<MyApp>("state.json") {
+    // Provide a default state if the file doesn't exist or can't be read
+    let app_state = match load_state::<MyApp>() {
         Ok(state) => state,
-        Err(_) => MyApp::default(), // Provide a default state if the file doesn't exist or can't be read
+        Err(_) => MyApp::default(), 
     };
     
     eframe::run_native(
@@ -108,16 +101,6 @@ impl eframe::App for MyApp {
                 // First column for the members list, cta, and output
                 columns[0].heading("Members");
                 columns[0].vertical(|ui| {
-                    // for member in &mut self.members {
-                    //     ui.label(member.name.clone());
-                    //     ui.horizontal(|ui| {
-                    //         ui.checkbox(&mut member.carry, "Carrying");
-                    //         ui.checkbox(&mut member.solo, "Solo");
-                    //         ui.checkbox(&mut member.ooo, "Out Of Office");
-                    //     });
-            
-                    //     ui.separator();
-                    // }
                     self.members_list(ui);
                 });
             
@@ -125,7 +108,7 @@ impl eframe::App for MyApp {
                     self.generate_pairs_btn(ui);
 
                     if ui.button("Save data").clicked() {
-                        if let Err(e) = save_state_to_file(self, "state.json") {
+                        if let Err(e) = save_state(self) {
                             eprintln!("Error saving data: {}", e);
                         } else {
                             println!("Data saved to file.");
@@ -136,7 +119,11 @@ impl eframe::App for MyApp {
 
                 if !self.today_pairs.is_empty() {
                     columns[0].horizontal(|ui| {
-                        ui.label(&self.today_pairs);
+                        // TODO: run once and save to variable because this is running every frame. also: refactor
+                        let mut pairs_output = self.today_pairs.replace(' ', " 👥");
+                        pairs_output = pairs_output.replace('+', "/");
+                        pairs_output = format!("{}{}", '👥', pairs_output);
+                        ui.label(pairs_output);
                     });
 
                     columns[0].horizontal(|ui| {
@@ -215,11 +202,9 @@ impl MyApp {
     fn generate_pairs_btn(&mut self, ui: &mut Ui) {
         if ui.button("Generate Pairs").clicked() {
             self.copied_to_clipboard = false;
-            let pairs = pair_generator::generate_pairs(&self.members, &self.history);
+            let pairs = generate_pairs(&self.members, &self.history);
             self.today_pairs = pairs_to_string(pairs);
             println!("{}", self.today_pairs);
-
-            println!("{}", members_to_json(&self.members));
         }
     }
 
@@ -235,10 +220,6 @@ impl MyApp {
 
 }
 
-fn members_to_json(members: &[Member]) -> String {
-    serde_json::to_string(members).unwrap()
-}
-
 /* TODO:
     - toml/yml for settings (customize output)
     - allow triples
@@ -246,16 +227,18 @@ fn members_to_json(members: &[Member]) -> String {
     - allow to manually set pair and roll for rest
 
     Members
-    - add member - adds to members
     - remove - removes from list, members
-    - persist member options
     Output
-    - format emojis
     - copy automatically checkbox/setting
     Search
     - ignore caps
     - make search only show that person + who they were paired with that day
     - if you type 2 names, it shows you when they've paired
         - doesnt matter if with spaces, dash, slash, plus
+    
+    Bugs
+    Add Member
+    - can add with empty string
+    Search
     - not showing solos
  */
