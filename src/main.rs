@@ -78,21 +78,15 @@ impl Default for MyApp {
 
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::SidePanel::left("imed").resizable(false).show(ctx, |ui| {
+        egui::SidePanel::left("leftPanel").resizable(false).show(ctx, |ui| {
 
-            if ui.button("Open Dialog").clicked() {
-                self.show_add_member_dialog = true;
-            }
-        });
-
-        egui::TopBottomPanel::bottom("op_panel").show(ctx, |ui| {
-            if ui.button("Open Dialog").clicked() {
+            if ui.button("Edit Members").clicked() {
                 self.show_add_member_dialog = true;
             }
         });
 
         if self.show_add_member_dialog {
-           self.add_member_dialog(ctx);
+           self.edit_members_dialog(ctx);
         }
 
         egui::CentralPanel::default().show(ctx, |ui| {  
@@ -135,8 +129,6 @@ impl eframe::App for MyApp {
                     });
                 }
 
-                
-
                 // second column for history
                 columns[1].heading("History");
                 columns[1].horizontal(|ui| {
@@ -173,32 +165,65 @@ impl MyApp {
         }
     }
 
-    fn add_member_dialog(&mut self, ctx: &egui::Context) {
+    fn edit_members_dialog(&mut self, ctx: &egui::Context) {
         egui::Window::new("Dialog")
             .title_bar(false)
             .resizable(false)
             .show(ctx, |ui| {
-                ui.label("Add member");
+                ui.label("Edit Members");
+    
+                let mut members_to_remove: Vec<usize> = vec![];
+    
+                ui.horizontal(|ui| {
+                    // left half
+                    ui.vertical(|ui| {
+                        for (index, member) in self.members.iter_mut().enumerate() {
+                            ui.horizontal(|ui| {
+                                let x_button = egui::Button::new("x")
+                                    .fill(egui::Color32::TRANSPARENT)
+                                    .frame(false);
 
-                let name_label = ui.label("Name: ");
-                ui.text_edit_singleline(&mut self.new_member)
-                    .labelled_by(name_label.id);
+                                if ui.add(x_button).clicked() {
+                                    members_to_remove.push(index);
+                                }
+                                ui.label(&member.name);
+                            });
+                        }
+                    });
+    
+                    // Add space between the two views
+                    ui.add_space(f32::from(ui.available_width()) / 2.0 - ui.spacing().item_spacing.x);
+    
+                    // right half
+                    ui.vertical(|ui| {
+                        ui.label("Add member");
 
-                // TODO: find how to put side by side and _centered_ (ui.with_layout)
-                if ui.button("Cancel").clicked() {
-                    self.show_add_member_dialog = false;
-                    self.new_member.clear();
-                }
+                        let name_label = ui.label("Name: ");
+                        ui.text_edit_singleline(&mut self.new_member)
+                            .labelled_by(name_label.id);
 
-                if ui.button("Add").clicked() {
-                    self.show_add_member_dialog = false;
-                    // add member to list and json
-                    self.members.push(Member::new(&self.new_member));
-                    self.new_member.clear();
+                        // TODO: find how to put side by side and _centered_ (ui.with_layout)
+                        if ui.button("Cancel").clicked() {
+                            self.show_add_member_dialog = false;
+                            self.new_member.clear();
+                        }
+
+                        if ui.button("Add").clicked() {
+                            // self.show_add_member_dialog = false;
+                            self.members.push(Member::new(&self.new_member));
+                            self.new_member.clear();
+                        }
+
+                    });
+                });
+    
+                // Remove members in reverse order to prevent shifting indices
+                for index in members_to_remove.into_iter().rev() {
+                    self.members.remove(index);
                 }
             });
     }
-
+    
     fn generate_pairs_btn(&mut self, ui: &mut Ui) {
         if ui.button("Generate Pairs").clicked() {
             self.copied_to_clipboard = false;
@@ -221,24 +246,28 @@ impl MyApp {
 }
 
 /* TODO:
-    - toml/yml for settings (customize output)
-    - allow triples
-    - solo/carry/ooo logic
-    - allow to manually set pair and roll for rest
+    Features
+        - toml/yml for settings (customize output, auto copy, etc.)
+        - allow to manually set pair and roll for rest
 
-    Members
-    - remove - removes from list, members
-    Output
-    - copy automatically checkbox/setting
-    Search
-    - ignore caps
-    - make search only show that person + who they were paired with that day
-    - if you type 2 names, it shows you when they've paired
-        - doesnt matter if with spaces, dash, slash, plus
+        pairs_handler
+        - allow triples
+        - solo/carry/ooo logic
+
+        UI
+            Output
+            - copy automatically checkbox/setting
+
+            Search
+            - ignore caps
+            - make search only show that person + who they were paired with that day
+            - if you type 2 names, it shows you when they've paired
+            - doesnt matter if with spaces, dash, slash, plus
     
     Bugs
-    Add Member
-    - can add with empty string
-    Search
-    - not showing solos
+        Add Member
+        - can add with empty string
+
+        Search
+        - not showing solos
  */
