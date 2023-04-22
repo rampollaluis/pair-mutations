@@ -1,27 +1,13 @@
-use std::{fs::File, hash::Hash, io::{BufRead, BufReader}, collections::HashMap};
+use std::{hash::Hash, collections::HashMap};
 use eframe::egui::{self, Ui};
 use serde::{Deserialize, Serialize};
 use arboard::Clipboard;
 
-use models::Data;
 use state_persistence::{load_state_from_file, save_state_to_file};
 use pair_generator::pairs_to_string;
 
-mod models;
 mod state_persistence;
 mod pair_generator;
-mod history_handler;
-
-fn read_members() -> Vec<String> {
-    let file = File::open("members.txt").unwrap();
-    let reader = BufReader::new(file);
-    let mut members = Vec::new();
-    for line in reader.lines() {
-        let member = line.unwrap();
-        members.push(member);
-    }
-    members
-}
 
 fn main() -> Result<(), eframe::Error> {
     // history_handler::append_to_history(&today_pairs);
@@ -85,47 +71,9 @@ impl Member {
 
 impl Default for MyApp {
     fn default() -> Self {
-        //members
-        let mut members = Vec::new();
-        for mem in read_members() {
-            members.push(Member::new(&mem));
-        }
-        // populate history
-        let file = File::open("history.txt").unwrap();
-        let reader = BufReader::new(file);
-
-        let mut data = Data::new();
-
-        for line in reader.lines() {
-            let line = line.unwrap();
-            let mut parts = line.split(' ');
-    
-            let date = parts.next().unwrap().to_string();
-            let mut pairs = Vec::new();
-            let mut current_pair = Vec::new();
-    
-            for part in parts {
-                if part.contains('+') {
-                    if !current_pair.is_empty() {
-                        pairs.push(current_pair.clone());
-                        current_pair.clear();
-                    }
-                    current_pair.extend(part.split('+').map(|name| name.to_string()));
-                } else {
-                    current_pair.push(part.to_string());
-                }
-            }
-    
-            if !current_pair.is_empty() {
-                pairs.push(current_pair.clone());
-            }
-    
-            data.add_entry(date, pairs);
-        }
-
         Self {
-            members: members,
-            history: data.history,
+            members: Vec::new(),
+            history: HashMap::new(),
             copied_to_clipboard: false,
             search: String::new(),
             today_pairs: String::new(),
@@ -137,11 +85,6 @@ impl Default for MyApp {
 
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            if ui.button("Open Dialog").clicked() {
-                self.show_add_member_dialog = true;
-            }
-        });
         egui::SidePanel::left("imed").resizable(false).show(ctx, |ui| {
 
             if ui.button("Open Dialog").clicked() {
@@ -254,7 +197,7 @@ impl MyApp {
                 ui.text_edit_singleline(&mut self.new_member)
                     .labelled_by(name_label.id);
 
-                // find how to put side by side and _centered_ (ui.with_layout)
+                // TODO: find how to put side by side and _centered_ (ui.with_layout)
                 if ui.button("Cancel").clicked() {
                     self.show_add_member_dialog = false;
                     self.new_member.clear();
@@ -297,16 +240,14 @@ fn members_to_json(members: &[Member]) -> String {
 }
 
 /* TODO:
-    - toml/yml for settings (members instead of members.txt, customize output)
+    - toml/yml for settings (customize output)
     - allow triples
     - solo/carry/ooo logic
     - allow to manually set pair and roll for rest
-    - remove Data struct
-    - remove history.txt and members.txt
 
     Members
-    - add member - adds to members.txt
-    - remove - removes from list, members.txt
+    - add member - adds to members
+    - remove - removes from list, members
     - persist member options
     Output
     - format emojis
