@@ -2,6 +2,7 @@ use std::{hash::Hash, collections::HashMap};
 use eframe::egui::{self, Ui};
 use serde::{Deserialize, Serialize};
 use arboard::Clipboard;
+use chrono::prelude::*;
 
 use state_persistence::{load_state, save_state};
 use pairs_handler::{pairs_to_string, generate_pairs};
@@ -137,7 +138,14 @@ impl eframe::App for MyApp {
                         .labelled_by(search_label.id);
                 });
                 columns[1].vertical(|ui| {
-                    for day in &self.history {
+                    // Step 1: Collect the HashMap keys and values in a Vec of tuples
+                    let mut history_vec: Vec<(&String, &Vec<Vec<String>>)> = self.history.iter().collect();
+                
+                    // Step 2: Sort the Vec by the keys
+                    history_vec.sort_by_key(|k| k.0);
+                
+                    // Step 3: Iterate over the sorted Vec and display the content in the UI
+                    for day in history_vec {
                         let text = format!("{} {}", day.0, pairs_to_string(day.1.to_vec()));
                         if text.contains(&self.search) {
                             ui.label(text);
@@ -166,11 +174,12 @@ impl MyApp {
     }
 
     fn edit_members_dialog(&mut self, ctx: &egui::Context) {
-        egui::Window::new("Dialog")
-            .title_bar(false)
+        egui::Window::new("Edit Members")
+            .title_bar(true)
+            .collapsible(false)
             .resizable(false)
             .show(ctx, |ui| {
-                ui.label("Edit Members");
+                ui.label("Members");
     
                 let mut members_to_remove: Vec<usize> = vec![];
     
@@ -228,8 +237,10 @@ impl MyApp {
         if ui.button("Generate Pairs").clicked() {
             self.copied_to_clipboard = false;
             let pairs = generate_pairs(&self.members, &self.history);
-            self.today_pairs = pairs_to_string(pairs);
-            println!("{}", self.today_pairs);
+            let today = Utc::now();
+            let today = today.format("%Y-%m-%d");
+            self.today_pairs = pairs_to_string(pairs.clone());
+            self.history.insert(today.to_string(), pairs);
         }
     }
 
@@ -270,4 +281,13 @@ impl MyApp {
 
         Search
         - not showing solos
+
+        GetPairs
+        - doesn't work with odd # of members
+        
+    Future
+        - set standard group # (eg. triples instead of pairs)
+        - divide members into groups (pair members only with members of same group or only pair members with members from other groups)
+        - pick random pair for pre-ipm
+        - pick random member for retro
  */
