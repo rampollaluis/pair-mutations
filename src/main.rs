@@ -50,6 +50,7 @@ pub struct Member {
     ooo: bool,
     carry: bool,
     solo: bool,
+    new: bool,
 }
 
 impl Member {
@@ -59,6 +60,7 @@ impl Member {
             ooo: false,
             carry: false,
             solo: false,
+            new: false,
         }
     }
 }
@@ -167,6 +169,7 @@ impl MyApp {
                 ui.checkbox(&mut member.carry, "Carrying");
                 ui.checkbox(&mut member.solo, "Solo");
                 ui.checkbox(&mut member.ooo, "Out Of Office");
+                ui.checkbox(&mut member.new, "New Member/Intern")
             });
 
             ui.separator();
@@ -263,7 +266,7 @@ impl MyApp {
 
         pairs_handler
         - allow triples
-        - solo/carry/ooo logic
+        - solo/carry/ooo/new logic
 
         UI
             Output

@@ -4,49 +4,57 @@
       "name": "Bert",
       "ooo": false,
       "carry": false,
-      "solo": false
+      "solo": false,
+      "new": false
     },
     {
       "name": "Callum",
       "ooo": false,
       "carry": false,
-      "solo": true
+      "solo": true,
+      "new": false
     },
     {
       "name": "Joel",
       "ooo": false,
       "carry": false,
-      "solo": false
+      "solo": false,
+      "new": false
     },
     {
       "name": "Johnny",
       "ooo": true,
       "carry": true,
-      "solo": true
+      "solo": true,
+      "new": false
     },
     {
       "name": "Karl",
       "ooo": false,
       "carry": false,
-      "solo": false
+      "solo": false,
+      "new": false
     },
     {
       "name": "Lewis",
       "ooo": false,
       "carry": false,
-      "solo": false
+      "solo": false,
+      "new": false
     },
     {
       "name": "Nico",
       "ooo": true,
       "carry": false,
-      "solo": false
+      "solo": false,
+      "new": false
     },
     {
       "name": "utyt",
       "ooo": false,
       "carry": false,
-      "solo": false
+      "solo": false,
+      "new": false
     }
   ],
   "history": {
