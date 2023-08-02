@@ -285,12 +285,8 @@ impl MyApp {
         Search
         - not showing solos
 
-        GetPairs
-        - doesn't work with odd # of members
-        
     Future
         - set standard group # (eg. triples instead of pairs)
-        - divide members into groups (pair members only with members of same group or only pair members with members from other groups)
-        - pick random pair for pre-ipm
-        - pick random member for retro
+        - pick pair for pre-ipm (track in history which pair hasn't done pre ipm in the longest collectively)
+        - pick random (or based on history) member for retro
  */

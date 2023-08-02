@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::Member;
 
-fn get_days_since_last_pair(pair_history: &HashMap<String, Vec<Vec<String>>>, member1: &str, member2: &str) -> u32 {
+fn get_days_since_last_pair(pair_history: &HashMap<String, Vec<Vec<String>>>, member1: &str, member2: Option<&str>) -> u32 {
     let mut days = 0;
 
     let mut dates: Vec<&String> = pair_history.keys().collect();
@@ -12,7 +12,7 @@ fn get_days_since_last_pair(pair_history: &HashMap<String, Vec<Vec<String>>>, me
     for date in dates {
         let pairs = &pair_history[date];
         for pair in pairs {
-            if pair.contains(&member1.to_string()) && pair.contains(&member2.to_string()) {
+            if pair.contains(&member1.to_string()) && (member2.map_or(true, |m| pair.contains(&m.to_string()))) {
                 return days;
             }
         }
@@ -23,7 +23,11 @@ fn get_days_since_last_pair(pair_history: &HashMap<String, Vec<Vec<String>>>, me
 }
 
 fn get_optimal_pairing(pair_history: &HashMap<String, Vec<Vec<String>>>, remaining: &[String], pairs: &mut Vec<Vec<String>>) -> Vec<Vec<String>> {
-    if remaining.is_empty() {
+    if remaining.len() == 1 {
+        let mut solo_pair = pairs.clone();
+        solo_pair.push(vec![remaining[0].clone()]);
+        return solo_pair;
+    } else if remaining.is_empty() {
         return pairs.clone();
     }
 
@@ -46,8 +50,14 @@ fn get_optimal_pairing(pair_history: &HashMap<String, Vec<Vec<String>>>, remaini
             new_pairs.push(vec![member1.clone(), member2.clone()]);
 
             let current_pairs = get_optimal_pairing(pair_history, &new_remaining, &mut new_pairs);
-            let score = current_pairs.iter().map(|pair| get_days_since_last_pair(pair_history, &pair[0], &pair[1])).sum::<u32>();
-
+            let score = current_pairs.iter().map(|pair| {
+                if pair.len() == 2 {
+                    get_days_since_last_pair(pair_history, &pair[0], Some(&pair[1]))
+                } else {
+                    get_days_since_last_pair(pair_history, &pair[0], None)
+                }
+            }).sum::<u32>();
+            
             if best_score.map(|s| score > s).unwrap_or(true) {
                 best_score = Some(score);
                 best_pairs = Some(current_pairs);
